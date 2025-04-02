@@ -1,75 +1,33 @@
-import java.util.ArrayList;
-import java.time.LocalTime;
-
 public class Professor {
     private String name;
     private int idProfessor;
     private Department department;
-    private ArrayList<ClassHour> classHours;
-    private ArrayList<Subject> subjects;
+    private SubjectManager subjectManager;
+    private ClassHourManager classHourManager;
 
-    public Professor(String name, int idProfessor, Department department) {
+    public Professor(String name, int idProfessor, Department department,
+                     SubjectManager subjectManager, ClassHourManager classHourManager) {
         this.name = name;
         this.idProfessor = idProfessor;
         this.department = department;
-        classHours = new ArrayList<>();
-        subjects = new ArrayList<>();
+        this.subjectManager = subjectManager;
+        this.classHourManager = classHourManager;
     }
 
-    public String getName() {
-        return name;
+    public void addSubject(Subject subject) {
+        subjectManager.addSubject(subject);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void addClassHour(ClassHour classHour) {
+        classHourManager.addClassHour(classHour);
     }
 
-    public int getIdProfessor() {
-        return idProfessor;
+    public void showSubjects() {
+        subjectManager.showSubjects();
     }
 
-    public void setIdProfessor(int idProfessor) {
-        this.idProfessor = idProfessor;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public ArrayList<ClassHour> getClassHours() {
-        return classHours;
-    }
-
-    public void setClassHours(ArrayList<ClassHour> classHours) {
-        this.classHours = classHours;
-    }
-
-    public ArrayList<Subject> getSubjects() {
-        return subjects;
-    }
-
-    public void setSubjects(ArrayList<Subject> subjects) {
-        this.subjects = subjects;
-    }
-
-    public void addClassHour(ClassHour classHour){
-        classHours.add(classHour);
-    }
-
-    public void addSubject(Subject subject){
-        subjects.add(subject);
-    }
-
-    public void subjectsList(int id){
-        if(idProfessor == id){
-            for(Subject subject : subjects) {
-                System.out.println(subject);
-            }
-       }
+    public void showClassHours() {
+        classHourManager.showClassHours();
     }
 
     @Override
@@ -78,8 +36,7 @@ public class Professor {
                 "name='" + name + '\'' +
                 ", idProfessor=" + idProfessor +
                 ", department=" + department +
-                ", classHours=" + classHours +
-                ", subjects=" + subjects +
                 '}';
     }
 }
+
