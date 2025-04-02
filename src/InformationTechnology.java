@@ -1,23 +1,15 @@
-public class InformationTechnology extends Department{
-    private boolean hasHackathonProgram;
+public class InformationTechnology extends Department implements HackathonProgram {
 
-    public InformationTechnology(String name, int idDepartment, boolean hasHackathonProgram) {
+    public InformationTechnology(String name, int idDepartment) {
         super(name, idDepartment);
-        this.hasHackathonProgram = hasHackathonProgram;
     }
 
-    public boolean isHasHackathonProgram() {
-        return hasHackathonProgram;
-    }
-
-    public void setHasHackathonProgram(boolean hasHackathonProgram) {
-        this.hasHackathonProgram = hasHackathonProgram;
+    public boolean hasHackathonProgram() {
+        return true; // En este caso asumo que siempre lo tiene
     }
 
     @Override
     public String toString() {
-        return "InformationTechnology{" +
-                "hasHackathonProgram=" + hasHackathonProgram +
-                '}';
+        return super.toString() + ", hasHackathonProgram=" + hasHackathonProgram();
     }
 }

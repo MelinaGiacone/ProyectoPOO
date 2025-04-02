@@ -1,9 +1,10 @@
 import java.util.ArrayList;
+import java.util.List;
 
-public class Department {
-    private String name;
+public abstract class Department implements ManageableDepartment{
     private int idDepartment;
-    private ArrayList<Professor> professorsList;
+    private String name;
+    private List<Professor> professorsList;
 
     public Department(String name, int idDepartment) {
         this.name = name;
@@ -11,39 +12,29 @@ public class Department {
         professorsList = new ArrayList<>();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getIdDepartment() {
-        return idDepartment;
-    }
-
-    public void setIdDepartment(int idDepartment) {
-        this.idDepartment = idDepartment;
-    }
-
-    public ArrayList<Professor> getProfessorsList() {
-        return professorsList;
-    }
-
-    public void setProfessorsList(ArrayList<Professor> professorsList) {
-        this.professorsList = professorsList;
-    }
-
+    @Override
     public void addProfessor(Professor professor) {
+        if (professor == null) {
+            throw new IllegalArgumentException("Professor cannot be null");
+        }
         professorsList.add(professor);
+    }
+
+    @Override
+    public void removeProfessor(Professor professor) {
+        professorsList.remove(professor);
+    }
+
+    @Override
+    public List<Professor> getProfessorsList() {
+        return professorsList;
     }
 
     @Override
     public String toString() {
         return "Department{" +
-                "name='" + name + '\'' +
-                ", idDepartment=" + idDepartment +
+                "idDepartment=" + idDepartment +
+                ", name='" + name + '\'' +
                 ", professorsList=" + professorsList +
                 '}';
     }
