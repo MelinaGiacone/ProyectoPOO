@@ -1,26 +1,35 @@
-import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Scanner;
-
 
 public class InstituteManagment {
     private ArrayList<Professor> professors;
-    private TimeRange timeRange;
 
     public InstituteManagment() {
         professors = new ArrayList<>();
     }
 
-    public void addProfessor(Professor professor){
+    public void addProfessor(Professor professor) {
         professors.add(professor);
     }
 
-    Scanner sc = new Scanner(System.in);
+    public ArrayList<Professor> getProfessors() {
+        return professors;
+    }
 
-    public ArrayList<StudioHead> showAvailableSubstitutes() {
-        TimeRange timeRange = getTimeRangeInput();
+    public TimeRange getTimeRangeInput(DayOfWeek dayOfWeek, String startTimeStr, String endTimeStr) {
+        LocalTime startTime = convertStringToLocalTime(startTimeStr);
+        LocalTime endTime = convertStringToLocalTime(endTimeStr);
+
+        return new TimeRangeImpl(dayOfWeek, startTime, endTime);
+    }
+
+    private LocalTime convertStringToLocalTime(String timeString) {
+        return LocalTime.parse(timeString);
+    }
+
+    public ArrayList<StudioHead> showAvailableSubstitutes(DayOfWeek dayOfWeek, String startTimeStr, String endTimeStr) {
+        TimeRange timeRange = getTimeRangeInput(dayOfWeek, startTimeStr, endTimeStr);
         ArrayList<StudioHead> availableSubstitutes = new ArrayList<>();
 
         for (Professor professor : professors) {
@@ -32,41 +41,49 @@ public class InstituteManagment {
             }
         }
 
-        if (!availableSubstitutes.isEmpty()) {
+        showMessage(availableSubstitutes);
+        return availableSubstitutes;
+    }
+
+    private static void showMessage(ArrayList<StudioHead> availableSubstitutes) {
+        if (availableSubstitutes.isEmpty())
+            System.out.println("No professors are available for substitutions at the specified time.");
+        else {
             System.out.println("Available professors for substitutions:");
             for (StudioHead studioHead : availableSubstitutes) {
                 System.out.println(" - " + studioHead.getName() + " (ID: " + studioHead.getIdProfessor() + ")");
             }
-        } else {
-            System.out.println("No professors are available for substitutions at the specified time.");
         }
-
-        return availableSubstitutes;
     }
 
-
-    public void assignSubstituteProfessor() {
-        ArrayList<StudioHead> availableSubstitutes = showAvailableSubstitutes();
+    public void assignSubstituteProfessor(String startTimeStr, String endTimeStr, DayOfWeek dayOfWeek, Subject subject) {
+        ArrayList<StudioHead> availableSubstitutes = showAvailableSubstitutes(dayOfWeek, startTimeStr, endTimeStr);
 
         if (!availableSubstitutes.isEmpty()) {
             StudioHead selectedSubstitute = availableSubstitutes.get(0);
 
-            System.out.println("Enter the class to be substituted: ");
-            String className = sc.nextLine();
+            CoverHour newCoverHour = new CoverHour(dayOfWeek,
+                    LocalTime.parse(startTimeStr),
+                    LocalTime.parse(endTimeStr),
+                    Status.PENDING,
+                    subject);
 
-            CoverHour newCoverHour = new CoverHour(timeRange.getDayOfWeek(), timeRange.getStartTime(), timeRange.getEndTime(), className);
             selectedSubstitute.addCoverHour(newCoverHour);
 
-            System.out.println("Professor " + selectedSubstitute.getName() + " has been assigned to the class: " + className);
+            System.out.println("Professor " + selectedSubstitute.getName() + " has been assigned to substitute the class: " + subject.getName());
         } else {
             System.out.println("No professors are available for substitution in this time range.");
         }
     }
 
 
-    public void sendNotificationIfNoSubstituteAvailable() {
-        ArrayList<StudioHead> availableSubstitutes = showAvailableSubstitutes();
+    public void sendNotificationIfNoSubstituteAvailable(String startTimeStr, String endTimeStr, DayOfWeek dayOfWeek, Subject subject) {
+        ArrayList<StudioHead> availableSubstitutes = showAvailableSubstitutes(dayOfWeek, startTimeStr, endTimeStr);
 
+        showNotification(availableSubstitutes);
+    }
+
+    private static void showNotification(ArrayList<StudioHead> availableSubstitutes) {
         if (availableSubstitutes.isEmpty()) {
             System.out.println("No professors are available to substitute. The study group can go home.");
         } else {
@@ -74,65 +91,45 @@ public class InstituteManagment {
         }
     }
 
-    public void registerAbsence() {
-        System.out.println("Enter the ID of the absent professor: ");
-        int idProfessor = sc.nextInt();sc.nextLine();
-
+    public void registerAbsence(int id, String reason) {
         boolean professorFound = false;
         for (Professor professor : professors) {
-            if (professor.getIdProfessor() == idProfessor) {
+            if (professor.getIdProfessor() == id) {
                 professorFound = true;
-                System.out.println("Enter the reason for the absence: ");
-                String reason = sc.nextLine();
                 System.out.println("Absence registered of " + professor.getName() + " for reason: " + reason);
                 break;
             }
         }
 
+        showMessageNotFound(id, professorFound);
+    }
+
+    private static void showMessageNotFound(int id, boolean professorFound) {
         if (!professorFound) {
-            System.out.println("No professor found with ID: " + idProfessor);
+            System.out.println("No professor found with ID: " + id);
         }
     }
 
     public void showSubjectsAssignedToProfessors() {
-        if (professors.isEmpty()) {
-            System.out.println("No professors available in the system.");
-            return;
-        }
-
         for (Professor professor : professors) {
             System.out.println("Professor: " + professor.getName() + " (ID: " + professor.getIdProfessor() + ")");
-            if (professor.getSubjects().isEmpty()) {
-                System.out.println("  No subjects assigned.");
-            } else {
-                System.out.println("  Subjects assigned:");
-                for (Subject subject : professor.getSubjects()) {
-                    System.out.println("    - " + subject.getName());
-                }
-            }
-            System.out.println();
+
+            // Accedemos al SubjectManager del profesor para mostrar los subjects asignados
+            printSubjects(professor);
         }
     }
 
-    public TimeRange getTimeRangeInput() {
-        System.out.println("Enter the day of the week: ");
-        String dayInput = sc.nextLine().toUpperCase();
-        DayOfWeek dayOfWeek = DayOfWeek.valueOf(dayInput);
+    private void printSubjects(Professor professor) {
+        SubjectManager subjectManager = professor.getSubjectManager();
 
-        System.out.println("Enter the start time (format HH:mm): ");
-        String entrada = sc.nextLine();
-
-        System.out.println("Enter the end time (format HH:mm): ");
-        String salida = sc.nextLine();
-
-        LocalTime startTime = convertStringToLocalTime(entrada);
-        LocalTime endTime = convertStringToLocalTime(salida);
-
-        return new TimeRange(dayOfWeek, startTime, endTime);
+        if (!subjectManager.getAllSubjects().isEmpty()) {
+            System.out.println("Subjects assigned:");
+            subjectManager.showSubjects();
+        } else {
+            System.out.println("No subjects assigned.");
+        }
+        System.out.println();
     }
 
-    // Existing helper method to convert string to LocalTime
-    private LocalTime convertStringToLocalTime(String timeString) {
-        return LocalTime.parse(timeString);
-    }
 }
+

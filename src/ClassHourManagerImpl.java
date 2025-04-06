@@ -10,12 +10,11 @@ public class ClassHourManagerImpl implements ClassHourManager {
 
     @Override
     public void addClassHour(ClassHour classHour) {
-        classHours.add(classHour);
-    }
-
-    @Override
-    public void removeClassHour(ClassHour classHour) {
-        classHours.remove(classHour);
+        if (classHour != null) {
+            classHours.add(classHour);
+        } else {
+            System.out.println("The class hour cannot be null.");
+        }
     }
 
     @Override

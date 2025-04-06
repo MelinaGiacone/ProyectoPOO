@@ -1,7 +1,8 @@
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-public class TimeRange {
+
+public abstract class TimeRange {
     private DayOfWeek dayOfWeek;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -33,4 +34,5 @@ public class TimeRange {
                 '}';
     }
 }
+
 

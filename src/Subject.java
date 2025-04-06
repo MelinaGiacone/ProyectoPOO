@@ -21,7 +21,6 @@ public class Subject {
                 "name='" + name + '\'' +
                 ", department=" + department +
                 ", professor=" + professor +
-                +
-                        '}';
+                +'}';
     }
 }

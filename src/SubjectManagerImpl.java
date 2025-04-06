@@ -2,21 +2,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubjectManagerImpl implements SubjectManager {
-    private List<Subject> subjects;
+    private final List<Subject> subjects;
 
     public SubjectManagerImpl() {
         subjects = new ArrayList<>();
     }
 
-    @Override
-    public void addSubject(Subject subject) {
-        subjects.add(subject);
-    }
+
 
     @Override
-    public void removeSubject(Subject subject) {
-        subjects.remove(subject);
+    public void addSubject(Subject subject) {
+        if (subject == null) {
+            System.out.println("The subject cannot be null.");
+        } else {
+            subjects.add(subject);
+            System.out.println("Subject added: " + subject.getName());  // Para verificar que la asignatura se agrega
+        }
     }
+
 
     @Override
     public List<Subject> getAllSubjects() {

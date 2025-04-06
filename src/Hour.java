@@ -1,7 +1,6 @@
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-//Esta la voy a hacer abstracta porque no me interesa instanciarla
 public abstract class Hour {
     private DayOfWeek weekDay;
     private LocalTime startTime;
